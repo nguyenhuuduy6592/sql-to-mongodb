@@ -115,13 +115,14 @@ async function main () {
     const primaryKeysCollection = targetDb.collection("primaryKeys");
     await primaryKeysCollection.insertMany(primaryKeysResult.recordset);
 
-    const tablesResult = await sqlPool.request().query(`SELECT TABLE_CATALOG
-                                                            , TABLE_SCHEMA
-                                                            , TABLE_NAME = TABLE_SCHEMA + '.' + TABLE_NAME
-                                                            , TABLE_TYPE
-                                                        FROM INFORMATION_SCHEMA.TABLES
-                                                        WHERE TABLE_TYPE = 'BASE TABLE'
-                                                        AND TABLE_SCHEMA = 'SalesLT'`);
+    const tablesResult = await sqlPool.request().query(`
+        SELECT TABLE_CATALOG
+            , TABLE_SCHEMA
+            , TABLE_NAME = TABLE_SCHEMA + '.' + TABLE_NAME
+            , TABLE_TYPE
+        FROM INFORMATION_SCHEMA.TABLES
+        WHERE TABLE_TYPE = 'BASE TABLE'
+    `);
     const tableNames = E.from(tablesResult.recordset)
         .select(row => row.TABLE_NAME)
         .where(tableName => config.skip.indexOf(tableName) === -1)
